@@ -15,38 +15,90 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache vcpkg archives
+      # Set up CMake (stable action with v1 tag)
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: '3.29.x'
+
+      # Cache vcpkg binary archives (per OS)
+      - name: Cache vcpkg archives (Linux)
+        if: runner.os == 'Linux'
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache/vcpkg/archives
-            ~\AppData\Local\vcpkg\archives
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          path: ~/.cache/vcpkg/archives
+          key: linux-vcpkg-${{ hashFiles('vcpkg.json') }}
           restore-keys: |
-            ${{ runner.os }}-vcpkg-
+            linux-vcpkg-
 
-      - name: Set up CMake
-        uses: lukka/get-cmake@v3
+      - name: Cache vcpkg archives (macOS)
+        if: runner.os == 'macOS'
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/vcpkg/archives
+          key: macos-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            macos-vcpkg-
 
-      - name: Install vcpkg
+      - name: Cache vcpkg archives (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\vcpkg\archives
+          key: windows-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            windows-vcpkg-
+
+      # Install / bootstrap vcpkg if not present
+      - name: Ensure vcpkg (Windows)
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $repo = Join-Path $env:RUNNER_TEMP 'vcpkg'
-          if (!(Test-Path $repo)) { git clone https://github.com/microsoft/vcpkg $repo }
-          if ($IsWindows) {
-            & (Join-Path $repo 'bootstrap-vcpkg.bat') -disableMetrics
-          } else {
-            bash (Join-Path $repo 'bootstrap-vcpkg.sh') -disableMetrics
+          $vcpkg = "$env:USERPROFILE\vcpkg\vcpkg.exe"
+          if (!(Test-Path $vcpkg)) {
+            git clone https://github.com/microsoft/vcpkg $env:USERPROFILE\vcpkg
+            & $env:USERPROFILE\vcpkg\bootstrap-vcpkg.bat
           }
 
-      - name: Configure
-        shell: pwsh
-        run: cmake --preset msvc-debug
+      - name: Ensure vcpkg (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          if [ ! -x "$HOME/vcpkg/vcpkg" ]; then
+            git clone https://github.com/microsoft/vcpkg "$HOME/vcpkg"
+            "$HOME/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+          fi
 
-      - name: Build
+      # Configure + Build + Test
+      # Windows: use VS generator; Linux/macOS: single-config with Release
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
         shell: pwsh
-        run: cmake --build --preset build --parallel
+        run: |
+          cmake -S . -B build `
+            -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_TOOLCHAIN_FILE="$env:USERPROFILE/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: cmake --build build --config Release --parallel
+      - name: Test (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ctest --test-dir build --config Release --output-on-failure
 
-      - name: Test
-        shell: pwsh
-        run: ctest --preset test --output-on-failure
+      - name: Configure (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      - name: Build (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: cmake --build build --parallel
+      - name: Test (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: ctest --test-dir build --output-on-failure
