@@ -1,0 +1,49 @@
+﻿name: C++ CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+ - name: Cache vcpkg archives
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/vcpkg/archives
+          ~\AppData\Local\vcpkg\archives
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          ${{ runner.os }}-vcpkg-
+- name: Set up CMake
+      uses: lukka/get-cmake@latest
+
+- name: Install vcpkg
+      shell: bash
+      run: |
+        if [ ! -d "${{ runner.temp }}/vcpkg" ]; then
+          git clone https://github.com/microsoft/vcpkg "${{ runner.temp }}/vcpkg"
+        fi
+        "${{ runner.temp }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics || true
+- name: Configure
+      shell: bash
+      run: |
+        cmake -S . -B build -G Ninja \
+          -D CMAKE_BUILD_TYPE=Release \
+          -D CMAKE_TOOLCHAIN_FILE="${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+ - name: Build
+      shell: bash
+      run: cmake --build build --config Release --parallel
+
+ - name: Test
+      shell: bash
+      run: ctest --test-dir build --output-on-failure --build-config Release
