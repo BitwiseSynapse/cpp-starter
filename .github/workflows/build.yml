@@ -1,4 +1,4 @@
-﻿name: C++ CI
+name: C++ CI
 
 on:
   push:
@@ -12,38 +12,41 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
- - name: Cache vcpkg archives
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cache/vcpkg/archives
-          ~\AppData\Local\vcpkg\archives
-        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-        restore-keys: |
-          ${{ runner.os }}-vcpkg-
-- name: Set up CMake
-      uses: lukka/get-cmake@latest
+      - name: Checkout
+        uses: actions/checkout@v4
 
-- name: Install vcpkg
-      shell: bash
-      run: |
-        if [ ! -d "${{ runner.temp }}/vcpkg" ]; then
-          git clone https://github.com/microsoft/vcpkg "${{ runner.temp }}/vcpkg"
-        fi
-        "${{ runner.temp }}/vcpkg/bootstrap-vcpkg.sh" -disableMetrics || true
-- name: Configure
-      shell: bash
-      run: |
-        cmake -S . -B build -G Ninja \
-          -D CMAKE_BUILD_TYPE=Release \
-          -D CMAKE_TOOLCHAIN_FILE="${{ runner.temp }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      - name: Cache vcpkg archives
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/vcpkg/archives
+            ~\AppData\Local\vcpkg\archives
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
 
- - name: Build
-      shell: bash
-      run: cmake --build build --config Release --parallel
+      - name: Setup CMake
+        uses: lukka/get-cmake@v4
 
- - name: Test
-      shell: bash
-      run: ctest --test-dir build --output-on-failure --build-config Release
+      - name: Install vcpkg
+        shell: pwsh
+        run: |
+          $repo = Join-Path $env:RUNNER_TEMP 'vcpkg'
+          if (!(Test-Path $repo)) { git clone https://github.com/microsoft/vcpkg $repo }
+          if ($IsWindows) {
+            & (Join-Path $repo 'bootstrap-vcpkg.bat') -disableMetrics
+          } else {
+            bash (Join-Path $repo 'bootstrap-vcpkg.sh') -disableMetrics
+          }
+
+      - name: Configure
+        shell: pwsh
+        run: cmake --preset msvc-debug
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build --preset build --parallel
+
+      - name: Test
+        shell: pwsh
+        run: ctest --preset test --output-on-failure
