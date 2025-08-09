@@ -1,36 +1,34 @@
 name: CI (Windows)
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
     runs-on: windows-latest
-    defaults:
-      run:
-        shell: pwsh
 
     steps:
       - uses: actions/checkout@v4
 
-      # >>> Load MSVC environment (puts cl.exe and libs on PATH)
       - name: Set up MSVC (x64)
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
-      # <<<
 
       - name: Tool versions
+        shell: pwsh
         run: |
-          cl /Bv
           cmake --version
           ninja --version
 
       - name: Bootstrap vcpkg
+        shell: pwsh
         run: |
-          git clone https://github.com/microsoft/vcpkg $env:USERPROFILE/vcpkg
-          $env:USERPROFILE/vcpkg/bootstrap-vcpkg.bat
+          git clone https://github.com/microsoft/vcpkg "$env:USERPROFILE\vcpkg" || echo "vcpkg exists"
+          & "$env:USERPROFILE\vcpkg\bootstrap-vcpkg.bat"
 
-      - name: Cache vcpkg
+      - name: Cache vcpkg archives
         uses: actions/cache@v4
         with:
           path: |
@@ -38,13 +36,16 @@ jobs:
           key: windows-vcpkg-${{ hashFiles('vcpkg.json') }}
 
       - name: Configure (Debug)
+        shell: pwsh
         run: >
           cmake -S . -B build -G "Ninja"
           -DCMAKE_BUILD_TYPE=Debug
-          -DCMAKE_TOOLCHAIN_FILE=$env:USERPROFILE/vcpkg/scripts/buildsystems/vcpkg.cmake
+          -DCMAKE_TOOLCHAIN_FILE="$env:USERPROFILE\vcpkg\scripts\buildsystems\vcpkg.cmake"
 
       - name: Build
-        run: cmake --build build --parallel
+        shell: pwsh
+        run: cmake --build build --config Debug --parallel
 
       - name: Test
+        shell: pwsh
         run: ctest --test-dir build -C Debug --output-on-failure
