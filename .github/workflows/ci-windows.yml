@@ -12,11 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # >>> Load MSVC environment (puts cl.exe and libs on PATH)
+      - name: Set up MSVC (x64)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      # <<<
+
       - name: Tool versions
         run: |
+          cl /Bv
           cmake --version
           ninja --version
-          cl /Bv
 
       - name: Bootstrap vcpkg
         run: |
