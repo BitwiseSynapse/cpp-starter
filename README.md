@@ -1,10 +1,12 @@
 # C++ Starter — 12-Week C++ Mastery Journey
 
-[![C++ CI](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml/badge.svg)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
+[![Windows](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml/badge.svg?branch=main&label=Windows)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
+[![Ubuntu](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml/badge.svg?branch=main&label=Ubuntu)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
+[![macOS](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml/badge.svg?branch=main&label=macOS)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
 
 ## 📌 About This Repo
-This is the **foundation repository** for my 12-week C++ mastery journey.  
-It’s not just a “Hello World?” — it’s a **reusable, production-grade starter** with:
+This is the foundation repository for my 12-week C++ mastery journey.
+It’s not just a “Hello World?” — it’s a reusable, production-grade starter with:
 
 - **CMake + Ninja** build system  
 - **vcpkg** dependency management  
@@ -13,7 +15,7 @@ It’s not just a “Hello World?” — it’s a **reusable, production-grade s
 - **clang-tidy / cppcheck / MSVC analyzers** for static analysis  
 - **Cross-platform CI** (Windows, macOS, Linux) via GitHub Actions  
 
-Every project I do in the next 12 weeks will **build on top of this exact setup** — no more wasting time configuring tools per-project.
+Every project I do in the next 12 weeks will build on top of this exact setup — no more wasting time configuring tools per-project.
 
 ---
 
@@ -45,85 +47,62 @@ ctest --test-dir build -C Debug --output-on-failure
 
 ## 📅 12-Week C++ Mastery Plan
 ### Overall Rhythm
-- **Mon–Fri:** 45–90 min focused coding session
-  - Pull latest changes
-  - Create a new branch for the day’s task
-  - Code + write tests
+- **Mon–Fri: 45–90 min focused coding session
+  - Review 2–5 pages from a book or 1 short video segment.
+  - Pull latest changes, create a new branch for the day’s task.
+  - Code + write tests for the topic of the week.
   - Run sanitizers + static analysis
-  - Commit + push
+  - Commit + push — CI must go green before merging.
   - CI must go green before merging
-- **Saturday:** Review week’s work, refactor, document
-- **Sunday:** Rest
-
-Everything happens in **one evolving repo** that grows week-by-week — no starting over.
+- **Saturday:** Review week’s work, refactor, document, revisit theory.
+- **Sunday:** Rest or light reading.
 
 ---
 
-### Week-by-Week Breakdown
+## 📅 12-Week C++ Mastery Plan
 
-#### **Week 1 — Modern Basics I**
-- Functions, I/O, ranges
-- Write & test small programs daily
-- Learn to use `std::ranges` for clean iteration
-- CI: Ensure builds pass across compilers
+### Overall Rhythm
+- **Mon–Fri:** 45–90 min focused coding session  
+  1. Review 2–5 pages from a book or 1 short video segment.  
+  2. Pull latest changes, create a new branch for the day’s task.  
+  3. Code + write tests for the topic of the week.  
+  4. Run sanitizers + static analysis.  
+  5. Commit + push — CI must go green before merging.  
+- **Saturday (1–2 hrs):** Review week’s work, refactor, document, revisit theory.  
+- **Sunday:** Rest or light reading.
 
-#### **Week 2 — Modern Basics II**
-- Headers, const correctness, `optional` and `string_view`
-- Begin refactoring starter code into header/source separation
-- Add unit tests for edge cases
-
-#### **Week 3 — STL & Algorithms**
-- Master `std::vector`, `std::map`, `std::set`, `std::unordered_map`
-- Use algorithms like `transform`, `reduce`, `accumulate`
-- CI: Add more warnings and treat warnings as errors
-
-#### **Week 4 — RAII & Lifetimes**
-- Learn RAII principles (constructors, destructors)
-- Manage resources with smart pointers (`unique_ptr`, `shared_ptr`)
-- Add tests to confirm no leaks or invalid access
-
-#### **Week 5 — Move Semantics**
-- Implement move constructor and move assignment
-- Measure performance differences with/without moves
-- CI: Add AddressSanitizer for all builds
-
-#### **Week 6 — Templates I**
-- Function and class templates
-- Type deduction, template specialization
-- Test templates with multiple data types
-
-#### **Week 7 — Concepts & APIs**
-- Use C++20 concepts to constrain templates
-- Build a small API with clear contracts
-- Document your API in `README.md`
-
-#### **Week 8 — Concurrency I**
-- Threads, `std::async`, `std::future`
-- Race conditions & mutexes
-- Add ThreadSanitizer to CI for Linux builds
-
-#### **Week 9 — Concurrency II + Performance**
-- Profiling basics
-- Lock-free data structures
-- Use performance benchmarks (Google Benchmark)
-
-#### **Week 10 — I/O, JSON, Networking**
-- File I/O with `fstream`
-- Parse and serialize JSON (e.g., `nlohmann/json`)
-- Basic TCP client/server using ASIO
-
-#### **Week 11 — Hardening & Packaging**
-- Error handling patterns
-- Assertions vs exceptions
-- Package your project with CMake install rules
-
-#### **Week 12 — Capstone & Release**
-- Final project using everything learned
-- Tag v1.0 release on GitHub
-- Ensure CI/CD produces downloadable artifacts
+### Week-by-Week Topics
+1. **Modern Basics I** — Functions, I/O, ranges  
+2. **Modern Basics II** — Headers, const correctness, `optional`, `string_view`  
+3. **STL & Algorithms** — Containers, `transform`, `reduce`, `accumulate`  
+4. **RAII & Lifetimes** — Constructors/destructors, smart pointers  
+5. **Move Semantics** — Move constructors/assignment, perf gains  
+6. **Templates I** — Function/class templates, specialization  
+7. **Concepts & APIs** — C++20 concepts, building clean APIs  
+8. **Concurrency I** — Threads, `std::async`, mutexes, race conditions  
+9. **Concurrency II + Performance** — Profiling, lock-free data structures  
+10. **I/O, JSON, Networking** — File I/O, `nlohmann/json`, ASIO basics  
+11. **Hardening & Packaging** — Error handling, CMake install rules  
+12. **Capstone & Release** — Final project, GitHub release with artifacts  
 
 ---
 
-**💡 Reminder:**  
-This plan is executed entirely in this single repository.  
-Each week builds on the last, so by Week 12 you’ll have a polished, production-quality C++ codebase plus a full record of your journey.
+## 📚 Learning Resources
+
+**Books**
+- *A Tour of C++ (3rd Edition)* — Bjarne Stroustrup  
+- *Effective Modern C++* — Scott Meyers  
+- *C++20: The Complete Guide* — Nicolai Josuttis  
+
+**Videos & Talks**
+- [CppCon YouTube Playlist](https://www.youtube.com/user/CppCon)  
+- [C++ Weekly (Jason Turner)](https://www.youtube.com/c/cppweekly)  
+
+**Exercises**
+- [Exercism C++ Track](https://exercism.org/tracks/cpp)  
+- [Advent of Code](https://adventofcode.com/)  
+- [Project Euler](https://projecteuler.net/)  
+
+---
+
+✅ *Everything happens inside this single evolving repo so the entire history of learning, projects, and tooling stays in one place.*
