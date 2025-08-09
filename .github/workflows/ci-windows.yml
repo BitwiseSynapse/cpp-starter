@@ -1,17 +1,43 @@
 name: CI (Windows)
+
 on: [push, pull_request]
+
 jobs:
   build:
     runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Tool versions
+        run: |
+          cmake --version
+          ninja --version
+          cl /Bv
+
       - name: Bootstrap vcpkg
         run: |
-          git clone https://github.com/microsoft/vcpkg %USERPROFILE%\vcpkg
-          %USERPROFILE%\vcpkg\bootstrap-vcpkg.bat
-      - name: Configure
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=%USERPROFILE%\vcpkg\scripts\buildsystems\vcpkg.cmake
+          git clone https://github.com/microsoft/vcpkg $env:USERPROFILE/vcpkg
+          $env:USERPROFILE/vcpkg/bootstrap-vcpkg.bat
+
+      - name: Cache vcpkg
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\vcpkg\archives
+          key: windows-vcpkg-${{ hashFiles('vcpkg.json') }}
+
+      - name: Configure (Debug)
+        run: >
+          cmake -S . -B build -G "Ninja"
+          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_TOOLCHAIN_FILE=$env:USERPROFILE/vcpkg/scripts/buildsystems/vcpkg.cmake
+
       - name: Build
-        run: cmake --build build --config Debug --parallel
+        run: cmake --build build --parallel
+
       - name: Test
         run: ctest --test-dir build -C Debug --output-on-failure
