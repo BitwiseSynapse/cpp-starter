@@ -1,8 +1,8 @@
 # C++ Starter — 12-Week C++ Mastery Journey
 
-[![Windows](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml/badge.svg?branch=main&label=Windows)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
-[![Ubuntu](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml/badge.svg?branch=main&label=Ubuntu)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
-[![macOS](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml/badge.svg?branch=main&label=macOS)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
+[![Windows](https://img.shields.io/github/actions/workflow/status/BitwiseSynapse/cpp-starter/build.yml?branch=main&label=Windows&logo=windows&logoColor=white)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
+[![Ubuntu](https://img.shields.io/github/actions/workflow/status/BitwiseSynapse/cpp-starter/build.yml?branch=main&label=Ubuntu&logo=ubuntu&logoColor=white&color=E95420)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
+[![macOS](https://img.shields.io/github/actions/workflow/status/BitwiseSynapse/cpp-starter/build.yml?branch=main&label=macOS&logo=apple&logoColor=white&color=000000)](https://github.com/BitwiseSynapse/cpp-starter/actions/workflows/build.yml)
 
 ## 📌 About This Repo
 This is the foundation repository for my 12-week C++ mastery journey.
